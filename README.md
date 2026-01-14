@@ -1,6 +1,4 @@
-# learn-linux
-
-## ¿Qué es Linux?
+# ¿Qué es Linux?
 Linux es un sistema operativo de código abierto basado en Unix, creado por Linus Torvalds en 1991. Es el núcleo (kernel) que gestiona los recursos del hardware y permite que el software se ejecute en la computadora. Linux es gratuito, altamente personalizable y es la base de muchos sistemas operativos utilizados en servidores, dispositivos móviles, supercomputadoras y dispositivos integrados.
 
 ## Conceptos Fundamentales
@@ -26,10 +24,6 @@ Combinación del kernel de Linux con herramientas, aplicaciones y gestores de pa
 - Completamente configurable según necesidades
 - Múltiples entornos de escritorio disponibles
 - Flexibilidad para adaptar el sistema
-### 4. **Compatibilidad**
-- Funciona en hardware antiguo y moderno
-- Amplio soporte de arquitecturas (x86, ARM, etc.)
-- Gran cantidad de software disponible
 
 ## Distribuciones de Linux
 ### **Ubuntu**
@@ -54,3 +48,23 @@ Combinación del kernel de Linux con herramientas, aplicaciones y gestores de pa
 - Amplio soporte de hardware
 - Actualizaciones LTS (Long Term Support)
 - Ideal para: Servidores cloud, infraestructura
+
+## Infraestructura en la nube
+### VPS (Servidor Privado Virtual)
+- Un VPS es una partición virtualizada de un servidor físico que actúa como un servidor dedicado.
+- Permite a los usuarios tener control total sobre su entorno de servidor sin necesidad de compartir recursos con otros usuarios.
+- Ideal para alojar sitios web, aplicaciones y servicios en línea.
+- Ofrece flexibilidad, escalabilidad y costos más bajos en comparación con servidores dedicados.
+### VPC (Virtual Private Cloud)
+- Una VPC es una red privada virtual dentro de un entorno de nube pública.
+- Permite a los usuarios crear y gestionar su propia red aislada, con control sobre la configuración de subredes, tablas de rutas y gateways.
+- Ideal para ejecutar aplicaciones y servicios en un entorno seguro y escalable.
+### VPS vs VPC
+- Un VPS es un servidor virtualizado, mientras que una VPC es una red virtualizada.
+- Un VPS se utiliza para alojar aplicaciones y servicios, mientras que una VPC se utiliza para gestionar la conectividad y seguridad de esos servicios en la nube.
+- Ambos ofrecen flexibilidad y control, pero en diferentes niveles de la infraestructura de TI.
+
+---
+
+Para consultar los comandos de Linux organizados por categorías, ver el archivo [commands.md](commands.md)
+
