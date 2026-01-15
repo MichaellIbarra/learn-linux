@@ -300,6 +300,7 @@ apt show: Mostrar información detallada de un paquete específico
 apt list: Listar paquetes instalados o disponibles
   --installed: Filtra solo paquetes instalados
   grep: Buscar patrón específico
+  sudo grep -r "matichain.dev/chain.pem" /etc/nginx/
   apt list
   apt list --installed | grep python
 
@@ -628,7 +629,9 @@ Obtener certificado para Nginx: Solicitar y configurar certificado SSL automáti
   sudo certbot --nginx
   sudo certbot --nginx -d matichain.dev
   sudo certbot --nginx -d matichain.dev -d api.matichain.dev
-  sudo certbot --nginx --hsts --staple-ocsp -d matichain.dev -d api.matichain.dev
+  sudo certbot --nginx --hsts --staple-ocsp -d matichain.dev -d api.matichain.dev -d test.matichain.dev
+Expandir certificado existente
+  sudo certbot --nginx --expand -d matichain.dev -d api.matichain.dev -d test.matichain.dev
 
 Renovar certificados: Renovar certificados SSL antes de que expiren
   --dry-run: Simula renovación sin aplicar cambios (para probar)
@@ -637,6 +640,9 @@ Renovar certificados: Renovar certificados SSL antes de que expiren
 
 Ver certificados instalados: Listar todos los certificados activos y sus dominios
   sudo certbot certificates
+Eliminar el antiguo (sin -0001)
+  sudo certbot delete --cert-name matichain.dev
+
 
 Verificar timers de renovación automática: Comprobar si renovación automática está activa
   sudo systemctl list-timers
