@@ -596,6 +596,97 @@ Eliminar MySQL completamente: Desinstalar MySQL y eliminar todos sus datos
   sudo apt autoremove
   sudo apt autoclean
 
+## Administrando usuarios, bases de datos y privilegios en MySQL
+
+CREATE USER: Crear nuevo usuario de MySQL con contraseña
+  @localhost: Usuario solo puede conectarse localmente
+  @'%': Usuario puede conectarse desde cualquier host
+  IDENTIFIED BY: Establece la contraseña del usuario
+  CREATE USER matichain_dev@localhost IDENTIFIED BY 'password123';
+  CREATE USER 'usuario'@'%' IDENTIFIED BY 'contraseña_segura';
+  CREATE USER 'admin'@'192.168.1.%' IDENTIFIED BY 'pass123';
+
+DROP USER: Eliminar un usuario de MySQL completamente
+  DROP USER 'usuario'@'localhost';
+  DROP USER 'matichain_dev'@'localhost';
+
+ALTER USER: Modificar usuario existente (contraseña, plugin autenticación)
+  IDENTIFIED BY: Cambiar contraseña
+  IDENTIFIED WITH: Cambiar método de autenticación
+  ALTER USER 'root'@'localhost' IDENTIFIED BY 'nueva_password';
+  ALTER USER 'usuario'@'localhost' IDENTIFIED WITH mysql_native_password BY 'pass123';
+
+SELECT user FROM mysql.user: Ver lista de usuarios de MySQL
+  Muestra usuarios, hosts y plugins de autenticación
+  SELECT user, host, plugin FROM mysql.user;
+  SELECT user, host FROM mysql.user;
+
+CREATE DATABASE: Crear nueva base de datos en MySQL
+  IF NOT EXISTS: Solo crea si no existe (evita errores)
+  CHARACTER SET: Define codificación de caracteres
+  CREATE DATABASE hotel;
+  CREATE DATABASE matichain_db;
+  CREATE DATABASE tienda CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE DATABASE IF NOT EXISTS proyecto;
+
+DROP DATABASE: Eliminar base de datos y todo su contenido permanentemente
+  IF EXISTS: Solo elimina si existe (evita errores)
+  DROP DATABASE hotel;
+  DROP DATABASE IF EXISTS test_db;
+
+SHOW DATABASES: Listar todas las bases de datos disponibles en el servidor
+  SHOW DATABASES;
+  SHOW DATABASES LIKE 'mati%';
+
+USE: Seleccionar base de datos para trabajar con ella
+  USE hotel;
+  USE matichain_db;
+
+SHOW TABLES: Mostrar todas las tablas de la base de datos actual
+  SHOW TABLES;
+  SHOW TABLES FROM hotel;
+
+DESCRIBE: Mostrar estructura de una tabla (columnas, tipos, claves)
+  DESCRIBE nombre_tabla;
+  DESCRIBE usuarios;
+  DESC clientes;
+
+GRANT: Otorgar privilegios específicos a un usuario sobre base de datos o tablas
+  ALL PRIVILEGES: Todos los permisos (SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, etc)
+  SELECT, INSERT, UPDATE, DELETE: Permisos específicos de lectura/escritura
+  ON database.*: Aplica a todas las tablas de la base de datos
+  ON database.table: Aplica solo a tabla específica
+  TO: Especifica el usuario que recibe los privilegios
+  GRANT ALL PRIVILEGES ON hotel.* TO matichain_dev@localhost;
+  GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost';
+  GRANT SELECT, INSERT, UPDATE, DELETE ON matichain_db.* TO 'matichain_dev'@'localhost';
+  GRANT SELECT ON tienda.productos TO 'lector'@'localhost';
+  GRANT CREATE, DROP ON proyecto.* TO 'desarrollador'@'%';
+
+REVOKE: Revocar privilegios previamente otorgados a un usuario
+  REVOKE DELETE ON hotel.* FROM 'matichain_dev'@'localhost';
+  REVOKE ALL PRIVILEGES ON *.* FROM 'usuario'@'localhost';
+
+SHOW GRANTS: Mostrar privilegios de un usuario específico
+  FOR: Especifica el usuario a consultar
+  SHOW GRANTS FOR 'matichain_dev'@'localhost';
+  SHOW GRANTS FOR 'root'@'localhost';
+  SHOW GRANTS FOR CURRENT_USER;
+
+FLUSH PRIVILEGES: Recargar tabla de privilegios para aplicar cambios inmediatamente
+  Necesario después de modificar privilegios directamente en tablas de sistema
+  FLUSH PRIVILEGES;
+
+SET PASSWORD: Cambiar contraseña de usuario MySQL
+  FOR: Especifica usuario (si no se indica, cambia la del usuario actual)
+  SET PASSWORD FOR 'matichain_dev'@'localhost' = 'nueva_password';
+  SET PASSWORD = 'mi_nueva_password';
+
+exit/quit: Salir de la consola de MySQL
+  exit;
+  quit;
+  \q
+
 ## Haciendo Nginx y los sitios del VPS más seguros y eficientes
 
 Editar snippets de seguridad: Crear archivos reutilizables con headers de seguridad HTTP
@@ -644,7 +735,7 @@ Obtener certificado para Nginx: Solicitar y configurar certificado SSL automáti
   sudo certbot --nginx -d matichain.dev -d api.matichain.dev
   sudo certbot --nginx --hsts --staple-ocsp -d matichain.dev -d api.matichain.dev -d test.matichain.dev
 Expandir certificado existente
-  sudo certbot --nginx --expand -d matichain.dev -d api.matichain.dev -d test.matichain.dev
+  sudo certbot --nginx --expand -d matichain.dev -d api.matichain.dev -d test.matichain.dev -d wordpress.matichain.dev -d laravel.matichain.dev
 
 Renovar certificados: Renovar certificados SSL antes de que expiren
   --dry-run: Simula renovación sin aplicar cambios (para probar)
