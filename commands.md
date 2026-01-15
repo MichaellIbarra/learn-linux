@@ -885,3 +885,106 @@ Usar WP-CLI: Comandos para gestionar WordPress desde terminal
   wp core download
   wp plugin install woocommerce --activate
   wp plugin update --all
+
+## Desplegando un sitio WordPress en el VPS con WP-CLI
+
+Crear configuración de sitio Nginx para WordPress: Copiar plantilla base y personalizar para WordPress
+  sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/wordpress.matichain.dev
+  sudo nano /etc/nginx/sites-available/wordpress.matichain.dev
+
+Verificar versión de PHP-FPM disponible: Listar sockets de PHP-FPM para configurar Nginx
+  ll /run/php/
+  ls -la /run/php/
+
+Habilitar sitio WordPress en Nginx: Crear enlace simbólico para activar configuración
+  sudo ln -s /etc/nginx/sites-available/wordpress.matichain.dev /etc/nginx/sites-enabled/
+  sudo ln -s /etc/nginx/sites-available/wordpress.dominio.com /etc/nginx/sites-enabled/
+
+Listar sitios habilitados: Verificar qué sitios están activos en Nginx
+  ll /etc/nginx/sites-enabled/
+  ls -la /etc/nginx/sites-enabled/
+
+Validar y recargar Nginx: Probar configuración y aplicar cambios
+  sudo nginx -t
+  sudo systemctl reload nginx.service
+  sudo systemctl reload nginx
+
+Expandir certificado SSL para WordPress: Agregar nuevo subdominio al certificado existente
+  --expand: Agregar dominios sin crear certificado duplicado
+  sudo certbot --nginx --expand -d matichain.dev -d api.matichain.dev -d wordpress.matichain.dev
+  sudo certbot --nginx --expand -d dominio.com -d www.dominio.com -d wordpress.dominio.com
+
+Ver configuración de sitio: Revisar archivo de configuración completo
+  cat /etc/nginx/sites-available/wordpress.matichain.dev
+  cat wordpress.matichain.dev
+
+Crear directorio para WordPress: Crear carpeta donde se instalará WordPress
+  sudo mkdir /var/www/wordpress.matichain.dev
+  sudo mkdir /var/www/wordpress.dominio.com
+
+Descargar WordPress con WP-CLI: Obtener última versión de WordPress en directorio actual
+  --allow-root: Permite ejecutar WP-CLI como root (necesario con sudo)
+  --locale: Especificar idioma (es_ES, es_MX, en_US)
+  --version: Descargar versión específica
+  sudo wp core download --allow-root
+  sudo wp core download --allow-root --locale=es_ES
+  sudo wp core download --allow-root --version=6.4
+
+Cambiar propietario de archivos WordPress: Asignar permisos correctos al servidor web
+  -R: Recursivo (aplica a todos los archivos y subdirectorios)
+  www-data: Usuario del servidor web Nginx
+  sudo chown -R www-data /var/www/wordpress.matichain.dev/
+  sudo chown -R www-data:www-data /var/www/wordpress.dominio.com/
+  sudo chown -R matichelo:www-data /var/www/wordpress.matichain.dev/
+
+Cambiar grupo de archivos WordPress: Establecer grupo del servidor web
+  -R: Recursivo
+  sudo chgrp -R www-data /var/www/wordpress.matichain.dev/
+  sudo chgrp -R www-data /var/www/wordpress.dominio.com/
+
+Listar archivos de WordPress: Ver contenido del directorio WordPress
+  ll: Listar formato largo con detalles
+  -a: Mostrar archivos ocultos
+  ll
+  ll -a
+  ls -la
+
+Crear archivo .htaccess: Archivo de configuración para reglas de reescritura (opcional con Nginx)
+  sudo nano .htaccess
+  sudo touch .htaccess
+
+Cambiar propietario de .htaccess: Permitir que servidor web modifique .htaccess
+  sudo chown www-data .htaccess
+  sudo chown www-data:www-data .htaccess
+
+Ver contenido de .htaccess: Revisar reglas configuradas
+  cat .htaccess
+  sudo nano .htaccess
+
+Configurar WordPress desde WP-CLI: Crear archivo wp-config.php con datos de base de datos
+  --dbname: Nombre de la base de datos MySQL
+  --dbuser: Usuario de MySQL
+  --dbpass: Contraseña del usuario MySQL
+  --dbhost: Host de MySQL (generalmente localhost)
+  --locale: Idioma de WordPress
+  sudo wp config create --dbname=wordpress_db --dbuser=wp_user --dbpass='password' --allow-root
+  sudo wp config create --dbname=hotel --dbuser=matichain_dev --dbpass='_Pass123@_' --dbhost=localhost --locale=es_ES --allow-root
+
+Instalar WordPress desde WP-CLI: Completar instalación con título, usuario admin y email
+  --url: URL del sitio WordPress
+  --title: Título del sitio
+  --admin_user: Nombre de usuario administrador
+  --admin_password: Contraseña del administrador
+  --admin_email: Email del administrador
+  sudo wp core install --url=wordpress.matichain.dev --title="Mi Blog" --admin_user=admin --admin_password='Admin123!' --admin_email=admin@matichain.dev --allow-root
+  sudo wp core install --url=https://wordpress.dominio.com --title="Sitio WordPress" --admin_user=administrador --admin_password='Secure@Pass123' --admin_email=correo@dominio.com --allow-root
+
+Verificar instalación WordPress: Comprobar que WordPress está correctamente instalado
+  sudo wp core version --allow-root
+  sudo wp core is-installed --allow-root
+
+Establecer permisos recomendados WordPress: Configurar permisos seguros para archivos y directorios
+  Directorios: 755 (rwxr-xr-x)
+  Archivos: 644 (rw-r--r--)
+  sudo find /var/www/wordpress.matichain.dev/ -type d -exec chmod 755 {} \;
+  sudo find /var/www/wordpress.matichain.dev/ -type f -exec chmod 644 {} \;
