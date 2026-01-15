@@ -280,6 +280,161 @@ Combinación del kernel de Linux con herramientas, aplicaciones y gestores de pa
 - Puertos: Usa 80 (ws://) o 443 (wss:// para seguro)
 - Más eficiente que polling para actualizaciones frecuentes
 
+## Estructura de Directorios en Linux (Filesystem Hierarchy Standard)
+
+### /etc/ (System Configuration)
+- Directorio de configuración del sistema y aplicaciones
+- "etc" originalmente significaba "etcetera", ahora "Editable Text Configuration"
+- Contiene archivos de configuración en texto plano (sin binarios)
+- Requiere privilegios root para modificar archivos
+- Subdirectorios importantes:
+  - **/etc/nginx/**: Configuración de Nginx (nginx.conf, sites-available/, sites-enabled/)
+  - **/etc/apache2/**: Configuración de Apache web server
+  - **/etc/php/**: Configuración de PHP por versión (php.ini, php-fpm.conf)
+  - **/etc/mysql/**: Configuración de MySQL/MariaDB (my.cnf)
+  - **/etc/ssh/**: Configuración del servidor SSH (sshd_config)
+  - **/etc/fail2ban/**: Configuración de Fail2ban (jail.conf, jail.local)
+  - **/etc/systemd/**: Configuración de systemd y servicios
+  - **/etc/cron.d/**: Tareas programadas del sistema
+  - **/etc/hosts**: Mapeo local de nombres de dominio a IPs
+  - **/etc/fstab**: Configuración de montaje de discos al arrancar
+
+### /var/ (Variable Data)
+- Datos variables que cambian durante operación del sistema
+- Archivos que crecen o se modifican frecuentemente
+- Logs, bases de datos, cachés, colas de correo, archivos temporales
+- Subdirectorios principales:
+  - **/var/log/**: Archivos de registro (logs) del sistema y aplicaciones
+  - **/var/www/**: Directorio por defecto para sitios web (Nginx, Apache)
+  - **/var/lib/**: Datos persistentes de aplicaciones (bases de datos)
+  - **/var/cache/**: Cachés de aplicaciones
+  - **/var/tmp/**: Archivos temporales que persisten entre reinicios
+  - **/var/mail/**: Buzones de correo de usuarios
+
+### /var/log/ (System & Application Logs)
+- Todos los archivos de registro del sistema
+- Esencial para debugging, monitoreo y auditoría de seguridad
+- Logs importantes:
+  - **/var/log/syslog**: Log general del sistema (Ubuntu/Debian)
+  - **/var/log/auth.log**: Intentos de autenticación y accesos SSH
+  - **/var/log/nginx/**: Logs de Nginx (access.log, error.log)
+  - **/var/log/apache2/**: Logs de Apache web server
+  - **/var/log/mysql/**: Logs de MySQL (error.log, slow-query.log)
+  - **/var/log/php*-fpm.log**: Logs de PHP-FPM
+  - **/var/log/fail2ban.log**: Registro de IPs baneadas por Fail2ban
+  - **/var/log/kern.log**: Logs del kernel de Linux
+- Rotación automática con logrotate para evitar llenar disco
+
+### /var/www/ (Web Root Directory)
+- Directorio raíz por defecto para contenido web
+- Usado por Nginx, Apache y otros servidores web
+- Estructura típica:
+  - **/var/www/html/**: Sitio web por defecto
+  - **/var/www/dominio.com/**: Sitio de un dominio específico
+  - **/var/www/dominio.com/public_html/**: Carpeta pública del sitio
+- Permisos típicos: usuario del sitio + grupo www-data
+
+### /var/lib/ (Application State Data)
+- Datos persistentes de aplicaciones y servicios
+- Bases de datos, archivos de estado, información que debe sobrevivir reinicios
+- Subdirectorios importantes:
+  - **/var/lib/mysql/**: Archivos de base de datos MySQL/MariaDB
+  - **/var/lib/postgresql/**: Archivos de base de datos PostgreSQL
+  - **/var/lib/docker/**: Imágenes, contenedores y volúmenes de Docker
+  - **/var/lib/snapd/**: Paquetes instalados via Snap
+  - **/var/lib/apt/**: Estado del gestor de paquetes APT
+
+### /home/ (User Home Directories)
+- Directorios personales de cada usuario del sistema
+- Cada usuario tiene su espacio privado: /home/usuario/
+- Contiene archivos personales, configuraciones de usuario, proyectos
+- Subdirectorios comunes:
+  - **~/.ssh/**: Claves SSH y configuración (authorized_keys, id_rsa)
+  - **~/.config/**: Configuraciones de aplicaciones de usuario
+  - **~/.bashrc**: Configuración del shell bash
+  - **~/public_html/**: En algunos servidores, sitio web del usuario
+
+### /usr/ (User System Resources)
+- Programas y archivos de solo lectura compartidos por usuarios
+- Segunda jerarquía más grande después de raíz
+- Subdirectorios importantes:
+  - **/usr/bin/**: Binarios ejecutables de programas instalados por gestor de paquetes
+  - **/usr/sbin/**: Binarios de administración del sistema
+  - **/usr/lib/**: Librerías compartidas de programas
+  - **/usr/local/**: Software instalado manualmente (no por gestor de paquetes)
+  - **/usr/local/bin/**: Ejecutables instalados manualmente (scripts personalizados, programas compilados)
+  - **/usr/share/**: Datos compartidos independientes de arquitectura (docs, iconos)
+
+### /opt/ (Optional Software)
+- Software opcional o de terceros instalado manualmente
+- Aplicaciones comerciales o paquetes grandes
+- Cada aplicación en su propio subdirectorio: /opt/aplicacion/
+- Ejemplos: /opt/google/chrome/, /opt/lampp/ (XAMPP)
+
+### /tmp/ (Temporary Files)
+- Archivos temporales del sistema y aplicaciones
+- Se vacía automáticamente al reiniciar (en muchas distribuciones)
+- Cualquier usuario puede escribir aquí
+- No guardar datos importantes, se borran frecuentemente
+- Alternativa: /var/tmp/ (persiste entre reinicios)
+
+### /root/ (Root User Home)
+- Directorio home del usuario root (administrador)
+- Diferente de / (raíz del sistema)
+- Solo accesible por root
+- Contiene configuraciones y archivos del superusuario
+
+### /bin/ y /sbin/ (Essential Binaries)
+- **/bin/**: Comandos esenciales para todos los usuarios (ls, cp, cat, bash)
+- **/sbin/**: Comandos de administración del sistema (reboot, iptables, fdisk)
+- En sistemas modernos son enlaces simbólicos a /usr/bin/ y /usr/sbin/
+
+### /dev/ (Device Files)
+- Archivos especiales que representan dispositivos de hardware
+- Interfaz para comunicarse con hardware
+- Ejemplos:
+  - **/dev/sda**, **/dev/sdb**: Discos duros
+  - **/dev/null**: Dispositivo "agujero negro" (descarta todo)
+  - **/dev/random**: Generador de números aleatorios
+  - **/dev/tty**: Terminales
+
+### /proc/ (Process Information)
+- Sistema de archivos virtual (solo existe en RAM)
+- Información sobre procesos y kernel en tiempo real
+- Ejemplos:
+  - **/proc/cpuinfo**: Información del CPU
+  - **/proc/meminfo**: Información de memoria
+  - **/proc/[PID]/**: Información de proceso específico
+
+### /sys/ (System Information)
+- Sistema de archivos virtual para información del kernel
+- Interfaz con drivers de dispositivos
+- Información de hardware en tiempo real
+- Complemento moderno de /proc/
+
+### Rutas específicas por tecnología:
+
+#### PHP:
+- **/etc/php/8.1/**: Configuración de PHP 8.1
+- **/etc/php/8.1/fpm/**: PHP-FPM (FastCGI Process Manager)
+- **/etc/php/8.1/cli/**: PHP para línea de comandos
+- **/var/log/php8.1-fpm.log**: Logs de PHP-FPM
+
+#### Java:
+- **/usr/lib/jvm/**: Java Virtual Machines instaladas
+- **/etc/java-*/**: Configuración de Java
+- **/usr/share/java/**: Librerías JAR compartidas
+
+#### Node.js:
+- **/usr/bin/node**: Binario de Node.js
+- **/usr/lib/node_modules/**: Paquetes npm globales
+- **~/.npm/**: Caché de npm (por usuario)
+
+#### Python:
+- **/usr/bin/python3**: Binario de Python
+- **/usr/lib/python3.*/**: Librerías estándar de Python
+- **/usr/local/lib/python3.*/site-packages/**: Paquetes pip
+
 ---
 
 Para ver ejemplos de uso específicos de cada comando, consultar el archivo [commands.md](commands.md)

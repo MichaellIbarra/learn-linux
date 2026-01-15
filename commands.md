@@ -519,6 +519,19 @@ Deshabilitar sitio: Eliminar enlace simbólico de sites-enabled
 
 Crear directorio para sitio: Crear carpeta para archivos web del dominio
   sudo mkdir /var/www/matichain.dev
+  sudo chown -R matichelo:www-data /var/www/matichain.dev
+  sudo chmod 750 /var/www/matichain.dev
+    Permisos del directorio (750):
+      Usuario (7=rwx): leer, escribir, ejecutar (acceso completo)
+      Grupo (5=r-x): leer, ejecutar (puede listar y acceder)
+      Otros (0=---): nada (sin acceso)
+    Resultado: El usuario puede gestionar, Nginx (www-data) puede acceder, otros bloqueados
+  sudo chmod 640 /var/www/matichain.dev/*
+    Permisos de archivos (640):
+      Usuario (6=rw-): leer, escribir (puede editar archivos)
+      Grupo (4=r--): solo leer (Nginx puede servir archivos)
+      Otros (0=---): nada (sin acceso)
+    Resultado: Tú editas (index.html, imágenes), Nginx solo lee, otros bloqueados
   sudo nano /var/www/matichain.dev/index.html
 
 Copiar estructura de sitio: Duplicar configuración de un sitio existente
@@ -653,3 +666,131 @@ Editar crontab para renovación: Programar renovación automática de certificad
   sudo crontab -e
   sudo crontab -l
   crontab -l
+
+## Preparando el VPS para usar proyectos basados en PHP
+
+add-apt-repository: Agregar repositorios PPA (Personal Package Archive) externos
+  ppa:ondrej/php: Repositorio de Ondrej con versiones más recientes de PHP
+  sudo add-apt-repository ppa:ondrej/php
+  sudo apt update
+
+apt install php-fpm: Instalar PHP-FPM (FastCGI Process Manager) para Nginx
+  PHP-FPM: Gestor de procesos PHP optimizado para servidores web
+  Más eficiente que mod_php para Nginx
+  sudo apt install php-fpm
+
+php --version: Verificar versión de PHP instalada en el sistema
+  php --version
+  php -v
+
+Navegar a directorio de configuración PHP: Acceder a archivos de configuración de PHP
+  /etc/php/: Directorio principal de configuración
+  8.4/: Versión de PHP instalada
+  fpm/: Configuración de PHP-FPM
+  cli/: Configuración de PHP para línea de comandos
+  cd /etc/php/
+  cd /etc/php/8.4/
+  cd /etc/php/8.4/fpm/
+
+Editar php.ini: Modificar configuración principal de PHP
+  Cambiar límites de memoria, tamaño de archivos, tiempo de ejecución, etc.
+  sudo nano /etc/php/8.4/fpm/php.ini
+  sudo nano /etc/php/8.4/cli/php.ini
+
+systemctl reload php-fpm: Recargar configuración de PHP-FPM sin detener servicio
+  Aplica cambios en php.ini sin interrumpir sitios web activos
+  sudo systemctl reload php8.4-fpm
+  sudo systemctl reload php8.4-fpm.service
+  sudo systemctl restart php8.4-fpm
+  sudo systemctl status php8.4-fpm
+
+apt install extensiones PHP: Instalar módulos adicionales necesarios para aplicaciones PHP
+  php-mysql: Conexión a bases de datos MySQL/MariaDB
+  php-sqlite3: Soporte para SQLite
+  php-curl: Cliente HTTP para hacer peticiones externas
+  php-gd: Procesamiento de imágenes (GD Library)
+  php-mbstring: Manejo de cadenas multi-byte (caracteres UTF-8)
+  php-xml: Procesamiento de XML
+  php-xmlrpc: Soporte para XML-RPC
+  php-zip: Compresión y descompresión de archivos ZIP
+  sudo apt install php-mysql php-sqlite3 php-curl php-gd php-mbstring php-xml php-xmlrpc php-zip
+  sudo apt install php8.4-mysql php8.4-curl php8.4-gd
+
+php -r: Ejecutar código PHP directamente desde línea de comandos
+  Útil para scripts de una línea o instaladores
+  php -r "phpinfo();"
+  php -r "echo PHP_VERSION;"
+
+Instalar Composer: Gestor de dependencias para PHP (similar a npm para Node.js)
+  Paso 1: Descargar instalador
+  php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+  
+  Paso 2: Verificar integridad del instalador con hash SHA384
+  php -r "if (hash_file('sha384', 'composer-setup.php') === 'HASH_ACTUAL') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); exit(1); }"
+  
+  Paso 3: Ejecutar instalador (crea composer.phar)
+  php composer-setup.php
+  
+  Paso 4: Eliminar instalador
+  php -r "unlink('composer-setup.php');"
+  
+  Paso 5: Mover a directorio global para usar desde cualquier lugar
+  sudo mv composer.phar /usr/local/bin/composer
+  
+  Paso 6: Verificar instalación
+  composer --version
+  composer -v
+
+composer self-update: Actualizar Composer a la última versión disponible
+  sudo composer self-update
+  composer self-update
+
+chmod +x: Dar permisos de ejecución a un archivo (hacerlo ejecutable)
+  Necesario para scripts y binarios descargados
+  chmod +x archivo.sh
+  chmod +x wp-cli.phar
+
+curl -O: Descargar archivo desde URL manteniendo el nombre original
+  -O: Guarda con nombre del archivo remoto
+  curl -O https://ejemplo.com/archivo.zip
+  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+Instalar WP-CLI: Herramienta de línea de comandos para gestionar WordPress
+  Paso 1: Descargar WP-CLI
+  curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+  
+  Paso 2: Verificar que funciona
+  php wp-cli.phar --info
+  
+  Paso 3: Dar permisos de ejecución
+  chmod +x wp-cli.phar
+  
+  Paso 4: Mover a directorio global
+  sudo mv wp-cli.phar /usr/local/bin/wp
+  
+  Paso 5: Verificar instalación
+  wp --info
+  wp --version
+  wp
+
+Usar Composer: Comandos comunes para gestionar dependencias PHP
+  composer init: Crear nuevo proyecto Composer
+  composer install: Instalar dependencias del proyecto
+  composer require: Agregar nueva dependencia
+  composer update: Actualizar dependencias
+  composer dump-autoload: Regenerar autoloader
+  composer require vendor/package
+  composer install
+  composer update
+
+Usar WP-CLI: Comandos para gestionar WordPress desde terminal
+  wp core download: Descargar WordPress
+  wp core install: Instalar WordPress
+  wp plugin list: Listar plugins instalados
+  wp plugin install: Instalar plugin
+  wp plugin update: Actualizar plugins
+  wp theme list: Listar temas
+  wp db export: Exportar base de datos
+  wp core download
+  wp plugin install woocommerce --activate
+  wp plugin update --all
