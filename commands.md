@@ -558,6 +558,62 @@ Permitir HTTP y HTTPS en firewall: Abrir puertos 80 y 443 en UFW
   sudo ufw allow "Nginx HTTPS"
   sudo ufw allow "Nginx Full"
 
+## Gestionando servicios web temporalmente
+
+Listar sitios habilitados en Nginx: Ver qué sitios están actualmente activos
+  ls -la /etc/nginx/sites-enabled/
+  ll /etc/nginx/sites-enabled/
+
+Deshabilitar sitio temporalmente: Remover enlace simbólico sin borrar configuración
+  Configuración original se mantiene en sites-available
+  Para reactivar solo crear enlace simbólico de nuevo
+  sudo rm /etc/nginx/sites-enabled/laravel.matichain.dev
+  sudo rm /etc/nginx/sites-enabled/wordpress.matichain.dev
+  sudo rm /etc/nginx/sites-enabled/api.matichain.dev
+
+Deshabilitar todos los sitios excepto default: Detener todos los sitios personalizados
+  sudo rm /etc/nginx/sites-enabled/*
+  sudo rm /etc/nginx/sites-enabled/matichain.dev
+
+Reactivar sitio deshabilitado: Crear enlace simbólico nuevamente
+  sudo ln -s /etc/nginx/sites-available/laravel.matichain.dev /etc/nginx/sites-enabled/
+  sudo ln -s /etc/nginx/sites-available/wordpress.matichain.dev /etc/nginx/sites-enabled/
+
+Detener servicio Nginx: Apagar servidor web completamente (detiene TODOS los sitios)
+  sudo systemctl stop nginx
+  sudo systemctl stop nginx.service
+
+Detener servicio MySQL: Apagar servidor de base de datos
+  sudo systemctl stop mysql
+  sudo systemctl stop mysql.service
+
+Detener servicio PHP-FPM: Apagar procesador PHP
+  sudo systemctl stop php8.4-fpm
+  sudo systemctl stop php8.5-fpm
+
+Iniciar servicios detenidos: Volver a activar servicios apagados
+  sudo systemctl start nginx
+  sudo systemctl start mysql
+  sudo systemctl start php8.4-fpm
+
+Reiniciar servicios: Detener y volver a iniciar servicio
+  sudo systemctl restart nginx
+  sudo systemctl restart mysql
+  sudo systemctl restart php8.4-fpm
+
+Ver estado de servicios: Verificar si están activos o detenidos
+  sudo systemctl status nginx
+  sudo systemctl status mysql
+  sudo systemctl status php8.4-fpm
+
+Deshabilitar inicio automático de servicio: Evitar que servicio inicie al arrancar servidor
+  sudo systemctl disable nginx
+  sudo systemctl disable mysql
+
+Habilitar inicio automático de servicio: Servicio iniciará automáticamente al arrancar
+  sudo systemctl enable nginx
+  sudo systemctl enable mysql
+
 ## Instalando y configurando MySQL
 
 apt install mysql-server: Instalar servidor de base de datos MySQL
