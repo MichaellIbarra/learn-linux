@@ -228,6 +228,42 @@ Combinación del kernel de Linux con herramientas, aplicaciones y gestores de pa
 - Proveedores populares: Cloudflare, AWS CloudFront, Fastly, Akamai
 - Especialmente útil para sitios con audiencia global
 
+### Cloudflare
+- Plataforma integral de seguridad, rendimiento y confiabilidad para sitios web y aplicaciones
+- **Servicios principales:**
+  - **CDN Global**: Red de 300+ centros de datos para entregar contenido rápidamente
+  - **DNS Gratuito**: Uno de los DNS más rápidos del mundo (1.1.1.1)
+  - **Protección DDoS**: Mitiga ataques distribuidos de denegación de servicio automáticamente
+  - **WAF (Web Application Firewall)**: Protege contra vulnerabilidades web (SQL injection, XSS, etc.)
+  - **SSL/TLS Gratuito**: Certificados SSL automáticos con opción Flexible, Full o Full (Strict)
+  - **Bot Management**: Bloquea bots maliciosos, permite bots buenos (Google, etc.)
+  - **Page Rules**: Configuración personalizada por URL (caché, redirecciones, seguridad)
+  - **Workers**: Serverless computing en el edge para lógica personalizada
+  - **Zero Trust**: Soluciones de acceso seguro (VPN, autenticación)
+- **Modos de cifrado SSL/TLS:**
+  - **Off**: Sin cifrado (no recomendado)
+  - **Flexible**: Cifrado navegador↔Cloudflare, HTTP Cloudflare↔origen (no seguro)
+  - **Full**: Cifrado navegador↔Cloudflare↔origen, acepta certificados auto-firmados
+  - **Full (Strict)**: Cifrado completo con certificado válido en origen (recomendado)
+- **Ventajas:**
+  - Plan gratuito generoso para sitios personales y pequeños
+  - Mejora rendimiento automático (HTTP/2, HTTP/3, Brotli, minificación)
+  - Analíticas detalladas de tráfico y amenazas
+  - Oculta IP real del servidor origen (protección adicional)
+  - Caché inteligente configurable con purga manual o automática
+- **Limitaciones del plan gratuito:**
+  - Sin soporte por email/chat (solo comunidad)
+  - Page Rules limitadas (3)
+  - Sin configuración avanzada de WAF
+  - Certificados SSL compartidos
+- **Integración con VPS:**
+  - Configurar nameservers en registrador de dominio apuntando a Cloudflare
+  - Crear registros DNS (A, AAAA, CNAME) en Cloudflare dashboard
+  - Activar proxy (nube naranja) para protección o DNS-only (nube gris) para bypass
+  - Configurar Nginx/Apache en VPS para reconocer IPs reales (mod_cloudflare, real_ip)
+  - Origin Certificate gratuito de Cloudflare para SSL Full (Strict)
+- Alternativas: Fastly, AWS CloudFront, Akamai (más caros, enfoque empresarial)
+
 ### Balanceador de Carga (Load Balancer)
 - Distribuye tráfico entrante entre múltiples servidores backend
 - Evita sobrecarga de un solo servidor y mejora disponibilidad
