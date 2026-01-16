@@ -988,3 +988,155 @@ Establecer permisos recomendados WordPress: Configurar permisos seguros para arc
   Archivos: 644 (rw-r--r--)
   sudo find /var/www/wordpress.matichain.dev/ -type d -exec chmod 755 {} \;
   sudo find /var/www/wordpress.matichain.dev/ -type f -exec chmod 644 {} \;
+
+## Desplegando un proyecto Laravel existente en el VPS
+
+Crear configuración Nginx para Laravel: Copiar plantilla y configurar para proyecto Laravel
+  sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/laravel.matichain.dev
+  sudo nano /etc/nginx/sites-available/laravel.matichain.dev
+
+Verificar sockets PHP-FPM disponibles: Listar versiones de PHP-FPM para configuración
+  ll /run/php/
+  ls -la /run/php/
+
+Habilitar sitio Laravel: Crear enlace simbólico para activar configuración
+  sudo ln -s /etc/nginx/sites-available/laravel.matichain.dev /etc/nginx/sites-enabled/
+  sudo ln -s /etc/nginx/sites-available/laravel.dominio.com /etc/nginx/sites-enabled/
+
+Validar configuración Nginx: Probar sintaxis antes de aplicar cambios
+  sudo nginx -t
+
+Expandir certificado SSL para Laravel: Agregar subdominio Laravel al certificado existente
+  sudo certbot --nginx --expand -d matichain.dev -d api.matichain.dev -d laravel.matichain.dev
+  sudo certbot --nginx --expand -d dominio.com -d laravel.dominio.com
+
+Recargar Nginx: Aplicar cambios de configuración
+  sudo systemctl reload nginx.service
+  sudo systemctl reload nginx
+
+Clonar proyecto Laravel desde GitHub: Obtener código fuente del repositorio
+  git@github.com: Usa SSH (requiere clave SSH configurada)
+  https://github.com: Usa HTTPS (requiere credenciales)
+  sudo git clone git@github.com:usuario/proyecto-laravel.git laravel.matichain.dev
+  sudo git clone https://github.com/usuario/proyecto-laravel.git /var/www/laravel.dominio.com
+
+Instalar dependencias de Composer: Instalar paquetes PHP del proyecto Laravel
+  --ignore-platform-req: Ignorar requisitos de plataforma específicos
+  --no-dev: No instalar dependencias de desarrollo
+  sudo composer install
+  sudo composer install --no-dev
+  sudo composer install --ignore-platform-req=ext-dom --ignore-platform-req=php
+
+Actualizar dependencias Composer: Actualizar paquetes a versiones compatibles
+  sudo composer update
+  sudo composer update --ignore-platform-req=ext-dom --ignore-platform-req=php
+
+Instalar extensiones PHP necesarias para Laravel: Instalar módulos PHP requeridos
+  php-xml: Procesamiento XML (requerido por Laravel)
+  php-dom: Manipulación DOM (requerido)
+  php-curl: Cliente HTTP
+  php-mbstring: Manejo de strings multi-byte
+  php-mysql: Conexión a MySQL
+  sudo apt install php8.4-xml php8.4-curl php8.4-mbstring php8.4-mysql
+  sudo apt install php-xml php-dom php-curl php-mbstring php-mysql
+
+Configurar permisos de proyecto Laravel: Establecer propietario y grupo correctos
+  matichelo:www-data: Usuario puede editar, servidor web puede leer
+  -R: Aplicar recursivamente
+  sudo chown -R matichelo:www-data /var/www/laravel.matichain.dev
+  sudo chown -R usuario:www-data /var/www/laravel.dominio.com
+
+Configurar permisos de directorios de escritura Laravel: storage y bootstrap/cache necesitan propietario www-data
+  www-data:www-data: Servidor web puede escribir en estos directorios
+  -R: Aplicar recursivamente a subdirectorios
+  sudo chown -R www-data:www-data /var/www/laravel.matichain.dev/storage
+  sudo chown -R www-data:www-data /var/www/laravel.matichain.dev/bootstrap/cache
+
+Navegar a directorio del proyecto: Cambiar a carpeta del proyecto Laravel
+  cd /var/www/laravel.matichain.dev
+  cd /var/www/laravel.dominio.com
+
+Copiar archivo de configuración Laravel: Crear .env desde plantilla
+  .env.example: Plantilla de configuración
+  .env: Archivo de configuración real (no debe subirse a Git)
+  sudo cp .env.example .env
+  cp .env.example .env
+
+Editar configuración de entorno Laravel: Configurar variables de ambiente
+  APP_ENV: Ambiente (local, production)
+  APP_DEBUG: Modo debug (true solo en desarrollo)
+  DB_*: Configuración de base de datos
+  sudo nano .env
+  nano .env
+
+Generar clave de aplicación Laravel: Crear APP_KEY para cifrado
+  key:generate: Genera clave aleatoria y la guarda en .env
+  sudo php artisan key:generate
+  php artisan key:generate
+
+Ejecutar migraciones de base de datos: Crear tablas en MySQL
+  migrate: Ejecutar migraciones pendientes
+  --seed: Además ejecuta seeders (datos de prueba)
+  --force: Forzar en producción (sin confirmación)
+  sudo php artisan migrate
+  sudo php artisan migrate --seed
+  php artisan migrate --force
+
+Verificar estado de migraciones: Ver qué migraciones se han ejecutado
+  php artisan migrate:status
+  sudo php artisan migrate:status
+
+Crear archivo de logs manualmente: Crear archivo de logs si no existe
+  touch: Crear archivo vacío
+  sudo touch /var/www/laravel.matichain.dev/storage/logs/laravel.log
+  touch storage/logs/laravel.log
+
+Ver logs de Laravel: Revisar errores y eventos de la aplicación
+  laravel.log: Archivo principal de logs
+  tail -f: Seguir logs en tiempo real
+  cat storage/logs/laravel.log
+  tail -f storage/logs/laravel.log
+  sudo tail -f /var/www/laravel.matichain.dev/storage/logs/laravel.log
+
+Ver todos los comandos Artisan: Listar comandos disponibles de Laravel
+  php artisan
+  php artisan list
+
+Servir Laravel localmente (desarrollo): Iniciar servidor de desarrollo PHP
+  serve: Inicia servidor en http://localhost:8000
+  --host: Especificar IP
+  --port: Especificar puerto
+  php artisan serve
+  php artisan serve --host=0.0.0.0 --port=8080
+
+Limpiar todos los cachés de Laravel: Eliminar config, route, view y cache de aplicación
+  optimize:clear: Limpia todos los cachés a la vez
+  php artisan optimize:clear
+  sudo php artisan optimize:clear
+
+Limpiar caché de configuración: Eliminar configuración cacheada
+  config:clear: Elimina config cacheada (útil en desarrollo)
+  php artisan config:clear
+  sudo php artisan config:clear
+
+Limpiar caché de aplicación: Eliminar cache de datos de la aplicación
+  cache:clear: Limpia el cache de aplicación
+  php artisan cache:clear
+  sudo php artisan cache:clear
+
+Cachear configuración Laravel (producción): Compilar configuración para mejor rendimiento
+  config:cache: Genera archivo de configuración cacheado
+  Usar solo en producción, no en desarrollo
+  php artisan config:cache
+  sudo php artisan config:cache
+
+Cachear rutas Laravel (producción): Compilar rutas para mejor rendimiento
+  route:cache: Genera archivo de rutas cacheado
+  Usar solo en producción
+  php artisan route:cache
+  sudo php artisan route:cache
+
+Cachear vistas Laravel (producción): Compilar templates Blade
+  view:cache: Pre-compila todas las vistas Blade
+  php artisan view:cache
+  sudo php artisan view:cache
